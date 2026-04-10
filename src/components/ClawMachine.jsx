@@ -194,7 +194,7 @@ export default function ClawMachine({ poolSize=0, onPull, disabled, pulling }) {
             ) : disabled ? 'Insufficient Credits' : poolSize===0 ? 'Pool Empty' : 'PULL  ·  1 Credit'}
           </button>
           <div style={{ textAlign:'center',marginTop:8,fontFamily:"'DM Mono',monospace",fontSize:9,color:'rgba(240,237,230,0.18)',letterSpacing:1 }}>
-            $1 per pull · 5% Legendary · 15% Ultra Rare · 30% Rare
+            tap to pull · 5% Legendary · 15% Ultra Rare · 30% Rare
           </div>
         </div>
       </div>

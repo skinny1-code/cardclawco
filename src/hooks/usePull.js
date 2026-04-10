@@ -1,35 +1,24 @@
 import { useState, useCallback } from 'react'
 import { useApi } from './useApi.js'
 
-/**
- * usePull — wraps the /api/pull POST endpoint.
- * Replaces the local weightedPull() simulation from App.jsx.
- *
- * Returns: { pull, lastCard, pulling, error }
- */
-export function usePull({ onSuccess } = {}) {
-  const { apiFetch }  = useApi()
-  const [pulling, setPulling]   = useState(false)
-  const [lastCard, setLastCard] = useState(null)
-  const [error, setError]       = useState(null)
+export function usePull({ onSuccess, onError } = {}) {
+  const { apiFetch } = useApi()
+  const [pulling, setPulling] = useState(false)
 
-  const pull = useCallback(async () => {
-    if (pulling) return
+  const pull = useCallback(async (tier) => {
+    if (!tier) throw new Error('tier required')
     setPulling(true)
-    setError(null)
     try {
-      const result = await apiFetch('/api/pull', { method: 'POST' })
-      // result: { card, vault, pull, creditsRemaining }
-      setLastCard(result.vault) // vault entry has nft_token_id
-      if (onSuccess) onSuccess(result)
+      const result = await apiFetch('/api/pull', { method: 'POST', body: { tier } })
+      if (onSuccess) await onSuccess(result)
       return result
     } catch (err) {
-      setError(err.message)
+      if (onError) onError(err)
       throw err
     } finally {
       setPulling(false)
     }
-  }, [pulling, apiFetch, onSuccess])
+  }, [apiFetch, onSuccess, onError])
 
-  return { pull, lastCard, pulling, error }
+  return { pull, pulling }
 }

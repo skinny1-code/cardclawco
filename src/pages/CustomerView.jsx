@@ -65,9 +65,22 @@ export default function CustomerView() {
     }
   })
 
+  const [selectedTier, setSelectedTier] = useState(null)
+
+  const TIER_INFO = {
+    CoreClaw:    { key:'coreclaw_pulls',    price:'$25',  color:'#60A5FA', icon:'⚙️', pullsKey:'coreclaw_pulls'    },
+    PremierClaw: { key:'premierclaw_pulls', price:'$50',  color:'#34D399', icon:'⭐', pullsKey:'premierclaw_pulls' },
+    UltraClaw:   { key:'ultraclaw_pulls',   price:'$100', color:'#A78BFA', icon:'💎', pullsKey:'ultraclaw_pulls'   },
+    QuantumClaw: { key:'quantumclaw_pulls', price:'$500', color:'#C9A84C', icon:'⚡', pullsKey:'quantumclaw_pulls' },
+  }
+
+  // Auto-select tier if user has pulls ready
+  const availableTiers = user ? Object.entries(TIER_INFO).filter(([t,info]) => (user[info.pullsKey]||0) > 0) : []
+
   const handlePull = async () => {
-    if (pulling || !user || user.credits < 1) return
-    try { await pull() } catch (err) { showToast(err.message, 'error') }
+    const tierToUse = selectedTier || availableTiers[0]?.[0]
+    if (pulling || !tierToUse) return
+    try { await pull(tierToUse) } catch (err) { showToast(err.message, 'error') }
   }
 
   const doSwap = async () => {
@@ -111,10 +124,16 @@ export default function CustomerView() {
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
           {isSignedIn ? (
             <>
-              <button onClick={() => navigate('/store')} style={{ background:'rgba(201,168,76,0.08)', border:'1px solid rgba(201,168,76,0.2)', borderRadius:8, padding:'5px 12px', cursor:'pointer', textAlign:'right' }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:7, letterSpacing:2, color:'rgba(240,237,230,0.3)' }}>CREDITS</div>
-                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:18, fontWeight:600, color:'#C9A84C', lineHeight:1 }}>
-                  {user ? user.credits : <Spinner size={10}/>}
+              <button onClick={() => navigate('/')} style={{ background:'rgba(201,168,76,0.06)', border:'1px solid rgba(201,168,76,0.15)', borderRadius:8, padding:'5px 12px', cursor:'pointer', textAlign:'center' }}>
+                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:7, letterSpacing:1.5, color:'rgba(240,237,230,0.3)' }}>PULLS READY</div>
+                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:10, color:'#C9A84C', lineHeight:1.4 }}>
+                  {user ? <>
+                    {user.coreclaw_pulls>0 && <div>⚙️ {user.coreclaw_pulls}</div>}
+                    {user.premierclaw_pulls>0 && <div>⭐ {user.premierclaw_pulls}</div>}
+                    {user.ultraclaw_pulls>0 && <div>💎 {user.ultraclaw_pulls}</div>}
+                    {user.quantumclaw_pulls>0 && <div>⚡ {user.quantumclaw_pulls}</div>}
+                    {!user.coreclaw_pulls && !user.premierclaw_pulls && !user.ultraclaw_pulls && !user.quantumclaw_pulls && <div style={{color:'rgba(240,237,230,0.25)'}}>none</div>}
+                  </> : <Spinner size={10}/>}
                 </div>
               </button>
               <button onClick={() => navigate('/marketplace')} style={{ background:'rgba(52,211,153,0.08)', border:'1px solid rgba(52,211,153,0.2)', borderRadius:8, padding:'5px 10px', cursor:'pointer', textAlign:'center' }}>
@@ -177,14 +196,41 @@ export default function CustomerView() {
                 <LiveFeed apiFetch={apiFetch} />
               </div>
 
+              {/* Tier selector */}
+              <div style={{ marginBottom:12 }}>
+                <div style={{ fontFamily:"'DM Mono',monospace",fontSize:8,letterSpacing:2.5,color:'rgba(240,237,230,0.25)',marginBottom:10,textAlign:'center' }}>SELECT MACHINE</div>
+                <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:8 }}>
+                  {Object.entries(TIER_INFO).map(([tier,info]) => {
+                    const pulls = user?.[info.pullsKey] || 0
+                    const isSelected = selectedTier === tier || (!selectedTier && availableTiers[0]?.[0] === tier)
+                    return (
+                      <button key={tier} onClick={() => setSelectedTier(tier)} style={{ padding:'10px 12px',background:isSelected?`${info.color}15`:'rgba(255,255,255,0.02)',border:`1px solid ${isSelected?info.color:'rgba(255,255,255,0.06)'}`,borderRadius:10,cursor:'pointer',textAlign:'left',transition:'all 0.2s' }}>
+                        <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3 }}>
+                          <span style={{ fontSize:16 }}>{info.icon}</span>
+                          {pulls > 0 && <span style={{ fontFamily:"'DM Mono',monospace",fontSize:8,color:info.color,background:`${info.color}15`,padding:'1px 6px',borderRadius:4 }}>{pulls} READY</span>}
+                        </div>
+                        <div style={{ fontFamily:"'Cormorant Garamond',serif",fontSize:14,fontWeight:600,color:'#F0EDE6' }}>{tier}</div>
+                        <div style={{ fontFamily:"'DM Mono',monospace",fontSize:9,color:info.color }}>{info.price} / pull</div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
               {/* Claw machine */}
-              <ClawMachine poolSize={pool.length} onPull={handlePull} disabled={!user || user.credits < 1} pulling={pulling} />
+              <ClawMachine poolSize={pool.filter(c => c.claw_tier === (selectedTier || availableTiers[0]?.[0] || 'CoreClaw')).length} onPull={handlePull} disabled={!user || availableTiers.length === 0} pulling={pulling} />
 
               {/* Low credits nudge */}
-              {user && user.credits === 0 && (
-                <button onClick={() => navigate('/store')} style={{ width:'100%', marginTop:10, padding:'12px', background:'rgba(201,168,76,0.08)', border:'1px solid rgba(201,168,76,0.25)', borderRadius:10, color:'#C9A84C', fontFamily:"'Lato',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, cursor:'pointer' }}>
-                  ADD CREDITS — FROM $25 →
-                </button>
+              {user && !user.coreclaw_pulls && !user.premierclaw_pulls && !user.ultraclaw_pulls && !user.quantumclaw_pulls && (
+                <div style={{ marginTop:12, display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                  {[['⚙️','CoreClaw','$25','/coreclaw','#60A5FA'],['⭐','PremierClaw','$50','/premierclaw','#34D399'],['💎','UltraClaw','$100','/ultraclaw','#A78BFA'],['⚡','QuantumClaw','$500','/quantumclaw','#C9A84C']].map(([icon,name,price,path,color])=>(
+                    <button key={name} onClick={()=>navigate(path)} style={{ padding:'10px',background:`${color}08`,border:`1px solid ${color}20`,borderRadius:10,cursor:'pointer',textAlign:'center' }}>
+                      <div style={{ fontSize:18,marginBottom:3 }}>{icon}</div>
+                      <div style={{ fontFamily:"'Cormorant Garamond',serif",fontSize:13,fontWeight:600,color:'#F0EDE6' }}>{name}</div>
+                      <div style={{ fontFamily:"'DM Mono',monospace",fontSize:9,color }}>{price} / pull</div>
+                    </button>
+                  ))}
+                </div>
               )}
 
               {/* QuantumClaw special reveal */}
