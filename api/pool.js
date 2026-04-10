@@ -10,13 +10,12 @@ export default withAuth(async (req, res) => {
 
   const { data: cards, error } = await db
     .from('cards')
-    .select('id, name, image_url, grade, sport, year, set_name, player, rarity, pull_cost, total_supply, remaining, fmv, is_active, claw_tier')
+    .select('id,name,image_url,grade,sport,year,set_name,player,rarity,pull_cost,total_supply,remaining,fmv,is_active,claw_tier,total_pulls')
     .eq('is_active', true)
     .gt('remaining', 0)
     .order('fmv', { ascending: false })
 
   if (error) return res.status(500).json({ error: error.message })
-
   await cacheSet(CACHE_KEYS.POOL, cards, 60)
   return res.status(200).json({ cards, cached: false })
 })

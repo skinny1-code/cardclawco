@@ -212,6 +212,13 @@ export default function CustomerView() {
                     </div>
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:15, fontWeight:500, color:'#F0EDE6', marginBottom:4 }}>{lastCard.name}</div>
+                      {lastCard.total_pulls !== undefined && (
+                        <div style={{ fontFamily:"'DM Mono',monospace", fontSize:9, color:'rgba(240,237,230,0.35)', marginBottom:4 }}>
+                          {lastCard.total_pulls === 0 ? '🔥 First ever pull of this card' :
+                           lastCard.total_pulls <= 3 ? `🔥 Only pulled ${lastCard.total_pulls} time${lastCard.total_pulls===1?'':'s'} ever` :
+                           `Pulled ${lastCard.total_pulls} times total`}
+                        </div>
+                      )}
                       <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:6 }}>
                         <RarityBadge rarity={lastCard.rarity} small />
                       </div>

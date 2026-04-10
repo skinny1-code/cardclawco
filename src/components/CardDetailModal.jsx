@@ -29,6 +29,11 @@ export default function CardDetailModal({ card, onClose, onSwap, onRedeem }) {
           ['Year',              card.year  || '—',                        '#F0EDE6'],
           ['Set',               (card.set_name||'—').slice(0,18),        'rgba(240,237,230,0.5)'],
           ['Player',            (card.player||card.card_name||'—').slice(0,18), 'rgba(240,237,230,0.5)'],
+        ['Times Pulled',      card.total_pulls !== undefined ? (
+          card.total_pulls === 0 ? '🔥 FIRST EVER' :
+          card.total_pulls <= 3  ? `🔥 ${card.total_pulls}x (ultra rare!)` :
+          `${card.total_pulls}x`
+        ) : '—',  card.total_pulls !== undefined && card.total_pulls <= 3 ? '#F59E0B' : 'rgba(240,237,230,0.5)'],
         ].map(([l,v,c]) => (
           <div key={l} style={{ background:'rgba(0,0,0,0.25)', borderRadius:7, padding:'9px 12px' }}>
             <div style={{ fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:1.5, color:'rgba(240,237,230,0.25)', marginBottom:3 }}>{l}</div>
