@@ -28,8 +28,8 @@ export default function BottomNav() {
   return (
     <nav style={{
       position:'fixed', bottom:0, left:0, right:0, zIndex:200,
-      background:'rgba(8,11,16,0.96)',
-      borderTop:'1px solid rgba(255,255,255,0.07)',
+      background:'rgba(6,3,2,0.97)',
+      borderTop:'1px solid rgba(245,158,11,0.2)',
       backdropFilter:'blur(20px)',
       display:'flex', alignItems:'stretch',
       paddingBottom:'env(safe-area-inset-bottom, 8px)',
@@ -41,13 +41,13 @@ export default function BottomNav() {
             flex:1, padding:'10px 4px 6px', background:'none', border:'none',
             cursor:'pointer', display:'flex', flexDirection:'column',
             alignItems:'center', gap:3, position:'relative',
-            borderTop: active ? '2px solid #C9A84C' : '2px solid transparent',
+            borderTop: active ? '2px solid #FCD34D' : '2px solid transparent', background: active ? 'rgba(245,158,11,0.06)' : 'none',
             transition:'all 0.15s',
           }}>
             <span style={{ fontSize:20, lineHeight:1 }}>{t.icon}</span>
             <span style={{
-              fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:1,
-              color: active ? '#C9A84C' : 'rgba(240,237,230,0.3)',
+              fontFamily:"'Oswald',sans-serif", fontSize:9, letterSpacing:2, fontWeight:600,
+              color: active ? '#FCD34D' : 'rgba(240,237,230,0.3)', textShadow: active ? '0 0 10px rgba(252,211,77,0.5)' : 'none',
               transition:'color 0.15s',
             }}>{t.label}</span>
             {t.badge && (
