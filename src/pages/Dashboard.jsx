@@ -6,6 +6,7 @@ import { useApi } from '../hooks/useApi.js'
 import DailyPull from '../components/DailyPull.jsx'
 import LiveFeed from '../components/LiveFeed.jsx'
 import { resumeAudio } from '../lib/casinoAudio.js'
+import { TEST_MODE, TestPullButton } from '../components/TestModeBanner.jsx'
 
 const TIER_CFG = {
   CoreClaw:    { price:'$25',  color:'#3B82F6', neon:'#60A5FA', icon:'⚙️', pullKey:'coreclaw_pulls',    path:'/coreclaw',    bg:'rgba(59,130,246,0.1)',    border:'rgba(59,130,246,0.3)'  },
@@ -106,6 +107,20 @@ export default function Dashboard() {
                 <div style={{ fontFamily:"'Oswald',sans-serif", fontSize:26, fontWeight:700, color:s.color, lineHeight:1, textShadow:`0 0 15px ${s.color}50` }}>{s.value}</div>
               </button>
             ))}
+          </div>
+        )}
+
+        {/* TEST MODE — quick grant panel */}
+        {TEST_MODE && isSignedIn && (
+          <div style={{ marginBottom:20, background:'rgba(245,158,11,0.06)', border:'2px solid rgba(245,158,11,0.25)', borderRadius:14, padding:'16px' }}>
+            <div style={{ fontFamily:"'Oswald',sans-serif", fontSize:9, letterSpacing:3, color:'rgba(245,158,11,0.6)', marginBottom:12 }}>
+              ⚠ TEST MODE — GET FREE PULLS
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+              {[['CoreClaw','⚙️','/coreclaw'],['PremierClaw','⭐','/premierclaw'],['UltraClaw','💎','/ultraclaw'],['QuantumClaw','⚡','/quantumclaw']].map(([tier, icon, path]) => (
+                <TestPullButton key={tier} tier={tier} style={{ padding:'10px', fontSize:11 }} onGranted={() => navigate(path)}/>
+              ))}
+            </div>
           </div>
         )}
 

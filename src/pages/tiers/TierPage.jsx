@@ -4,6 +4,7 @@ import { SignInButton, useAuth } from '@clerk/clerk-react'
 import { useApi } from '../../hooks/useApi.js'
 import { useUser } from '../../hooks/useUser.js'
 import CasinoClawMachine from '../../components/CasinoClawMachine.jsx'
+import { TestPullButton, TEST_MODE } from '../../components/TestModeBanner.jsx'
 import CardReveal from '../../components/CardReveal.jsx'
 import { resumeAudio } from '../../lib/casinoAudio.js'
 
@@ -150,6 +151,13 @@ export default function TierPage({ config }) {
             onPullComplete={doPull}
           />
         </div>
+
+        {/* Test mode — free pull grant */}
+        {TEST_MODE && (
+          <div style={{ marginBottom:10 }}>
+            <TestPullButton tier={tierName} onGranted={async () => { await refresh() }}/>
+          </div>
+        )}
 
         {/* Buy button */}
         {isSignedIn ? (

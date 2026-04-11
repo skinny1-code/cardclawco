@@ -17,6 +17,7 @@ import QuantumClawPage from './pages/tiers/QuantumClawPage.jsx'
 import AdminAuthGate  from './components/AdminAuthGate.jsx'
 import ErrorBoundary  from './components/ErrorBoundary.jsx'
 import BottomNav      from './components/BottomNav.jsx'
+import { TestModeBanner } from './components/TestModeBanner.jsx'
 import { GS }         from './lib/constants.js'
 import { useApi }     from './hooks/useApi.js'
 
@@ -60,6 +61,7 @@ export default function App() {
     <>
       <style>{GS}</style>
       <ErrorBoundary>
+        <TestModeBanner />
         <Routes>
           <Route path="/"                element={<Dashboard />} />
           <Route path="/store"           element={<Store />} />
