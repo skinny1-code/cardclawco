@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SignInButton, useAuth } from '@clerk/clerk-react'
 import { useApi } from '../../hooks/useApi.js'
@@ -30,6 +30,12 @@ export default function TierPage({ config }) {
   const [pulling, setPulling] = useState(false)
   const [revealCard, setReveal] = useState(null)
   const [error, setError]     = useState(null)
+
+  // Auto-register user if not exists (belt & suspenders — App.jsx also does this)
+  useEffect(() => {
+    if (!isSignedIn) return
+    apiFetch('/api/user', { method:'POST', body:{} }).catch(() => {})
+  }, [isSignedIn])
 
   const pullKey   = PULL_COL[config.packId]
   const tierName  = TIER_NAME[config.packId]
